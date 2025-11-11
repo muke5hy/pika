@@ -2,13 +2,21 @@
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
 
-    let PikaEditor: any;
+    let Editor: any;
     let mounted = false;
+
+    // Use new canvas-based editor
+    const useCanvasEditor = true;
 
     onMount(async () => {
         if (browser) {
-            const module = await import('$lib/components/PikaEditor.svelte');
-            PikaEditor = module.default;
+            if (useCanvasEditor) {
+                const module = await import('$lib/components/CanvasEditor.svelte');
+                Editor = module.default;
+            } else {
+                const module = await import('$lib/components/PikaEditor.svelte');
+                Editor = module.default;
+            }
             mounted = true;
         }
     });
@@ -19,8 +27,8 @@
     <meta name="description" content="Create beautiful, customizable screenshots with Pika. Add backgrounds, shadows, and effects to your images." />
 </svelte:head>
 
-{#if mounted && PikaEditor}
-    <svelte:component this={PikaEditor} />
+{#if mounted && Editor}
+    <svelte:component this={Editor} />
 {:else}
     <!-- Loading state / SSR fallback -->
     <div class="flex items-center justify-center min-h-screen bg-linear-to-br from-pink-100 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-pink-900 dark:to-purple-900">
