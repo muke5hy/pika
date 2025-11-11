@@ -1,65 +1,38 @@
-NOTE: This repo contains free version features.
+# sv
 
-![image](https://user-images.githubusercontent.com/14031295/170217467-01249753-6213-40c1-87b6-c39aa762f6cf.png)
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-## What is Pika?
+## Creating a project
 
-Pika is a web app to transform RAW screenshots 
-into beautiful images, which you would be proud to share
-on your landing pages, emails, Twitter or marketing pages.
+If you're seeing this, you've probably already done this step. Congrats!
 
-The main goal behind Pika is to fasten this process
-of designing screenshots.
+```sh
+# create a new project in the current directory
+npx sv create
 
-## How Pika works?
+# create a new project in my-app
+npx sv create my-app
+```
 
-Pika uses `dom-to-image` to generate an image from
-a DOM element. The DOM element is the canvas 
-with your screenshot and all the stylings.
-Stylings are done using mix of inline CSS and Tailwind CSS.
+## Developing
 
-## How Pika makes designing screenshot quick?
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
-- Pika saves your options locally on your machine, so when you open the app next time it keeps your previous settings
-- Pika gives you shortcuts: 
-  - Ctrl/Cmd+V: paste a screenshot
-  - Ctrl/Cmd+C: copy the output image
-  - Ctrl/Cmd+S: save the output image
+```sh
+npm run dev
 
-## What all you can do with Pika?
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
 
-- Apply rounded corners to your screenshot
-- Apply background gradients
-- Control screenshot position in canvas, add padding
-- Add shadow to screenshot
-- Add noise to background to add RAW vibes
-- Add overlay text($$)
-- Add image as background($$)
-- Add custom watermark($$)
+## Building
 
-`($$)` are paid features and not available in this repo's code.
+To create a production version of your app:
 
-## Setting up the app
+```sh
+npm run build
+```
 
-First, run the development server:
+You can preview the production build with `npm run preview`.
 
-- Clone the repo
-- Setup with `yarn`
-- Run dev server with `yarn dev`
-- Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-- File located at `/components/main` contains the code for canvas and the stylings
-
-## Built using
-
-- Next.js
-- TailwindCSS
-
-## License
-
-[Here](https://github.com/rishimohan/pika/blob/main/license.md)
-
-## Assets
-
-![pika-filled-circle](https://user-images.githubusercontent.com/14031295/198069686-4b0853cf-f11f-4aab-9ceb-08c37f61a459.png)
-
-
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
