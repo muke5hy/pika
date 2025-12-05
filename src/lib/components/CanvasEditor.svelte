@@ -79,12 +79,27 @@
 	let imageWidth = 0;
 	let imageHeight = 0;
 
+	// Overlay images (additional images)
+	type OverlayImage = {
+		id: string;
+		image: HTMLImageElement;
+		x: number;
+		y: number;
+		scale: number;
+		rotation: number;
+	};
+
+	let overlayImages: OverlayImage[] = [];
+	let selectedOverlayId: string | null = null;
+
 	// Interaction state
 	let isDragging = false;
+	let isDraggingOverlay = false;
 	let dragStartX = 0;
 	let dragStartY = 0;
-	let editMode = true; // Always allow editing
-	let isSidebarOpen = true; // Default open
+	let dragOverlayStart = { x: 0, y: 0 };
+	let editMode = true;
+	let isSidebarOpen = true;
 
 	// Text state
 	type TextElement = {
@@ -96,6 +111,7 @@
 		fontFamily: string;
 		color: string;
 		align: 'left' | 'center' | 'right';
+		rotation: number;
 	};
 
 	let textElements: TextElement[] = [];
@@ -517,30 +533,70 @@
 			if (editingTextId === text.id) return;
 
 			context.save();
+
+			// Translate to text position
+			context.translate(text.x, text.y);
+
+			// Apply rotation
+			if (text.rotation) {
+				context.rotate((text.rotation * Math.PI) / 180);
+			}
+
 			context.font = `${text.fontSize}px ${text.fontFamily}`;
 			context.fillStyle = text.color;
 			context.textAlign = text.align;
 			context.textBaseline = 'middle';
 
-			// Draw text
-			context.fillText(text.text, text.x, text.y);
+			// Draw text at origin (0, 0) since we've translated
+			context.fillText(text.text, 0, 0);
 
 			// Draw selection box if selected
 			if (selectedTextId === text.id) {
 				const metrics = context.measureText(text.text);
 				const width = metrics.width;
-				const height = text.fontSize; // Approximate height
+				const height = text.fontSize;
 				const padding = 10;
 
 				context.strokeStyle = '#3b82f6';
 				context.lineWidth = 2;
 				context.strokeRect(
-					text.x - width / 2 - padding,
-					text.y - height / 2 - padding,
+					-width / 2 - padding,
+					-height / 2 - padding,
 					width + padding * 2,
 					height + padding * 2
 				);
 			}
+			context.restore();
+		});
+
+		// Draw overlay images
+		overlayImages.forEach((overlay) => {
+			context.save();
+
+			// Translate to overlay position
+			context.translate(overlay.x, overlay.y);
+
+			// Apply rotation
+			if (overlay.rotation) {
+				context.rotate((overlay.rotation * Math.PI) / 180);
+			}
+
+			// Apply scale
+			context.scale(overlay.scale, overlay.scale);
+
+			// Draw image centered at origin
+			const w = overlay.image.width;
+			const h = overlay.image.height;
+			context.drawImage(overlay.image, -w / 2, -h / 2, w, h);
+
+			// Draw selection box if selected
+			if (selectedOverlayId === overlay.id) {
+				const padding = 10;
+				context.strokeStyle = '#3b82f6';
+				context.lineWidth = 2;
+				context.strokeRect(-w / 2 - padding, -h / 2 - padding, w + padding * 2, h + padding * 2);
+			}
+
 			context.restore();
 		});
 	}
@@ -648,7 +704,36 @@
 		const mouseX = (e.clientX - rect.left) * scaleX;
 		const mouseY = (e.clientY - rect.top) * scaleY;
 
-		// Check text selection first (on top)
+		// Check overlay images first (on top)
+		let clickedOverlayId = null;
+		for (let i = overlayImages.length - 1; i >= 0; i--) {
+			const overlay = overlayImages[i];
+			const w = overlay.image.width * overlay.scale;
+			const h = overlay.image.height * overlay.scale;
+			const padding = 10;
+
+			// Simple bounding box check (rotation not accounted for simplicity)
+			if (
+				mouseX >= overlay.x - w / 2 - padding &&
+				mouseX <= overlay.x + w / 2 + padding &&
+				mouseY >= overlay.y - h / 2 - padding &&
+				mouseY <= overlay.y + h / 2 + padding
+			) {
+				clickedOverlayId = overlay.id;
+				break;
+			}
+		}
+
+		if (clickedOverlayId) {
+			selectedOverlayId = clickedOverlayId;
+			isDraggingOverlay = true;
+			dragOverlayStart = { x: mouseX, y: mouseY };
+			selectedTextId = null; // Deselect text
+			render();
+			return;
+		}
+
+		// Check text selection (on top of image, below overlays)
 		let clickedTextId = null;
 		// Use the non-null context for measuring
 		const context = ctx!;
@@ -678,11 +763,16 @@
 			selectedTextId = clickedTextId;
 			isDraggingText = true;
 			dragTextStart = { x: mouseX, y: mouseY };
+			selectedOverlayId = null; // Deselect overlay
 			render();
 			return;
 		} else {
 			if (selectedTextId) {
 				selectedTextId = null;
+				render();
+			}
+			if (selectedOverlayId) {
+				selectedOverlayId = null;
 				render();
 			}
 		}
@@ -709,6 +799,20 @@
 		const mouseX = (e.clientX - rect.left) * scaleX;
 		const mouseY = (e.clientY - rect.top) * scaleY;
 
+		if (isDraggingOverlay && selectedOverlayId) {
+			const dx = mouseX - dragOverlayStart.x;
+			const dy = mouseY - dragOverlayStart.y;
+
+			overlayImages = overlayImages.map((overlay) =>
+				overlay.id === selectedOverlayId
+					? { ...overlay, x: overlay.x + dx, y: overlay.y + dy }
+					: overlay
+			);
+			dragOverlayStart = { x: mouseX, y: mouseY };
+			render();
+			return;
+		}
+
 		if (isDraggingText && selectedTextId) {
 			const dx = mouseX - dragTextStart.x;
 			const dy = mouseY - dragTextStart.y;
@@ -733,6 +837,7 @@
 	function handleMouseUp() {
 		isDragging = false;
 		isDraggingText = false;
+		isDraggingOverlay = false;
 	}
 
 	function handleDoubleClick(e: MouseEvent) {
@@ -825,13 +930,37 @@
 			fontSize: 40,
 			fontFamily: 'Inter, sans-serif',
 			color: '#000000',
-			align: 'center'
+			align: 'center',
+			rotation: 0
 		};
 		textElements = [...textElements, newText];
 		selectedTextId = id;
 		render();
 	}
 
+	function addOverlayImage(file: File) {
+		const reader = new FileReader();
+		reader.onload = function (e: any) {
+			const img = new Image();
+			img.onload = function () {
+				const id = Math.random().toString(36).substr(2, 9);
+				const newOverlay: OverlayImage = {
+					id,
+					image: img,
+					x: canvasWidth / 2,
+					y: canvasHeight / 2,
+					scale: Math.min(canvasWidth / img.width, canvasHeight / img.height) * 0.3, // Start at 30% of canvas
+					rotation: 0
+				};
+				overlayImages = [...overlayImages, newOverlay];
+				selectedOverlayId = id;
+				render();
+				toast.success('Overlay image added!');
+			};
+			img.src = e.target.result;
+		};
+		reader.readAsDataURL(file);
+	}
 	async function saveImage() {
 		if (!canvas) {
 			toast.error('Nothing to save, make sure to add a screenshot first!');
@@ -1221,6 +1350,21 @@
 												/>
 											</div>
 
+											<div class="space-y-1">
+												<div class="flex justify-between text-xs text-gray-500">
+													<span>Rotation</span>
+													<span>{text.rotation}°</span>
+												</div>
+												<input
+													type="range"
+													min="-180"
+													max="180"
+													bind:value={text.rotation}
+													oninput={render}
+													class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+												/>
+											</div>
+
 											<div class="flex justify-end">
 												<Button
 													variant="destructive"
@@ -1228,6 +1372,93 @@
 													onclick={() => {
 														textElements = textElements.filter((t) => t.id !== selectedTextId);
 														selectedTextId = null;
+														render();
+													}}
+												>
+													Delete
+												</Button>
+											</div>
+										</div>
+									{/if}
+								{/each}
+							{/if}
+						</div>
+
+						<hr class="border-gray-200 dark:border-gray-700" />
+
+						<!-- Overlay Images -->
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+									>Overlay Images</span
+								>
+								<label>
+									<Button
+										variant="outline"
+										size="sm"
+										onclick={() => document.getElementById('overlay-image-input')?.click()}
+									>
+										Add Image
+									</Button>
+									<input
+										id="overlay-image-input"
+										type="file"
+										accept="image/*"
+										class="hidden"
+										onchange={(e) => {
+											const file = (e.target as HTMLInputElement).files?.[0];
+											if (file) {
+												addOverlayImage(file);
+												// Reset input so same file can be selected again
+												(e.target as HTMLInputElement).value = '';
+											}
+										}}
+									/>
+								</label>
+							</div>
+
+							{#if selectedOverlayId}
+								{#each overlayImages as overlay}
+									{#if overlay.id === selectedOverlayId}
+										<div class="space-y-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+											<div class="space-y-1">
+												<div class="flex justify-between text-xs text-gray-500">
+													<span>Scale</span>
+													<span>{(overlay.scale * 100).toFixed(0)}%</span>
+												</div>
+												<input
+													type="range"
+													min="0.1"
+													max="2"
+													step="0.05"
+													bind:value={overlay.scale}
+													oninput={render}
+													class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+												/>
+											</div>
+
+											<div class="space-y-1">
+												<div class="flex justify-between text-xs text-gray-500">
+													<span>Rotation</span>
+													<span>{overlay.rotation}°</span>
+												</div>
+												<input
+													type="range"
+													min="-180"
+													max="180"
+													bind:value={overlay.rotation}
+													oninput={render}
+													class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+												/>
+											</div>
+
+											<div class="flex justify-end">
+												<Button
+													variant="destructive"
+													size="sm"
+													onclick={() => {
+														overlayImages = overlayImages.filter((o) => o.id !== selectedOverlayId);
+														selectedOverlayId = null;
 														render();
 													}}
 												>
