@@ -313,8 +313,12 @@
 				break;
 			case 'custom':
 				if (options.customSize) {
-					contentWidth = options.customSize.width;
-					contentHeight = options.customSize.height;
+					// For custom size, use the exact dimensions as final canvas size
+					// (not as content area, to match user expectations)
+					canvasWidth = options.customSize.width;
+					canvasHeight = options.customSize.height;
+					contentWidth = canvasWidth - padding * 2;
+					contentHeight = canvasHeight - padding * 2;
 				}
 				break;
 			default: // aspect-auto
@@ -327,9 +331,11 @@
 				}
 		}
 
-		// Add padding to canvas size
-		canvasWidth = contentWidth + padding * 2;
-		canvasHeight = contentHeight + padding * 2;
+		// Add padding to canvas size (except for custom, which is already final)
+		if (options.aspectRatio !== 'custom') {
+			canvasWidth = contentWidth + padding * 2;
+			canvasHeight = contentHeight + padding * 2;
+		}
 
 		if (canvas) {
 			canvas.width = canvasWidth;
