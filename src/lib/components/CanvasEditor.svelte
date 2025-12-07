@@ -496,7 +496,7 @@
 
 			// Inset logic
 			if (options.inset?.active) {
-				// Draw inset background (e.g. black wrapper)
+				// Draw inset background (e.g. black wrapper with roundness)
 				ctx.fillStyle = options.inset.color;
 				roundRect(
 					ctx,
@@ -508,25 +508,24 @@
 				);
 				ctx.fill();
 
-				// Reset shadow for the image itself so it doesn't double up?
-				// Usually the shadow is on the container.
+				// Reset shadow for the image itself so it doesn't double up
 				ctx.shadowColor = 'transparent';
 			}
 
-			// Clip for image roundness
-			// If inset is active, the image inside might not need roundness or maybe small roundness?
-			// Let's assume the roundness applies to the wrapper if inset is active, or the image if not.
-			// If inset is active, we already drew the rounded wrapper. Now we draw the image on top.
-			// Let's just draw the image normally on top of the inset.
+			// Apply roundness clipping to the image
+			// Calculate inner roundness (slightly smaller for inset to look natural)
+			const innerRoundness = options.inset?.active
+				? Math.max(0, (options.roundness || 0) - options.inset.padding / 2)
+				: options.roundness || 0;
 
-			if (!options.inset?.active) {
-				// If no inset, we round the image itself
-				roundRect(ctx, x, y, w, h, options.roundness || 0);
-				ctx.clip();
-			}
+			// Clip the image to rounded rectangle
+			ctx.save();
+			roundRect(ctx, x, y, w, h, innerRoundness);
+			ctx.clip();
 
 			ctx.drawImage(uploadedImage, x, y, w, h);
 
+			ctx.restore();
 			ctx.restore();
 
 			ctx.restore();
@@ -1247,147 +1246,56 @@
 							{/if}
 						</div>
 
-						<!-- Rotate -->
-						<div class="space-y-2">
+						<!-- Position & Transform -->
+						<div class="space-y-3">
 							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Rotate</span>
-								<span class="text-xs text-gray-500">{options.rotate}°</span>
+								<span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+									>Position & Rotate</span
+								>
 							</div>
-							<input
-								type="range"
-								min="-45"
-								max="45"
-								step="1"
-								bind:value={options.rotate}
-								oninput={render}
-								class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-							/>
-						</div>
-
-						<!-- Position -->
-						<div class="space-y-2">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Position</span>
-							</div>
-							<div class="mx-auto grid w-24 grid-cols-3 gap-1">
-								{#each ['top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'] as pos}
-									<button
-										class={cls(
-											'flex h-6 w-6 items-center justify-center rounded border border-gray-200 hover:bg-gray-100',
-											options.position === pos
-												? 'bg-black text-white hover:bg-black'
-												: 'bg-white text-gray-500'
-										)}
-										onclick={() => {
-											applyPosition(pos);
-											render();
-										}}
-										title={pos}
-									>
-										<div class="h-1.5 w-1.5 rounded-full bg-current"></div>
-									</button>
-								{/each}
-							</div>
-						</div>
-
-						<!-- Tilt -->
-						<div class="flex items-center justify-between">
-							<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tilt</span>
-							<div class="flex items-center space-x-2">
-								<!-- Placeholder for tilt position grid -->
-								<div class="grid h-8 w-8 grid-cols-3 gap-0.5 rounded bg-gray-100 p-0.5">
-									{#each Array(9) as _}
-										<div class="rounded-[1px] bg-gray-300"></div>
+							<div class="flex items-center gap-3">
+								<!-- Position Grid -->
+								<div class="grid w-20 grid-cols-3 gap-0.5">
+									{#each ['top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'] as pos}
+										<button
+											class={cls(
+												'flex h-5 w-5 items-center justify-center rounded border',
+												options.position === pos
+													? 'border-black bg-black'
+													: 'border-gray-200 bg-white hover:bg-gray-100'
+											)}
+											onclick={() => {
+												applyPosition(pos);
+												render();
+											}}
+											title={pos}
+										>
+											<div
+												class={cls(
+													'h-1 w-1 rounded-full',
+													options.position === pos ? 'bg-white' : 'bg-gray-400'
+												)}
+											></div>
+										</button>
 									{/each}
 								</div>
+								<!-- Rotate Control -->
+								<div class="flex-1 space-y-1">
+									<div class="flex justify-between text-xs text-gray-500">
+										<span>Rotate</span>
+										<span>{options.rotate}°</span>
+									</div>
+									<input
+										type="range"
+										min="-45"
+										max="45"
+										step="1"
+										bind:value={options.rotate}
+										oninput={render}
+										class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+									/>
+								</div>
 							</div>
-						</div>
-
-						<hr class="border-gray-200 dark:border-gray-700" />
-
-						<!-- Text -->
-						<div class="space-y-4">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Text</span>
-								<Button variant="outline" size="sm" onclick={addText}>Add Text</Button>
-							</div>
-
-							{#if selectedTextId}
-								{#each textElements as text}
-									{#if text.id === selectedTextId}
-										<div class="space-y-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-											<textarea
-												bind:value={text.text}
-												oninput={render}
-												class="w-full rounded border border-gray-200 bg-white p-2 text-sm dark:border-gray-700 dark:bg-gray-900"
-												rows="2"
-											></textarea>
-
-											<div class="flex space-x-2">
-												<select
-													bind:value={text.fontFamily}
-													onchange={render}
-													class="flex-1 rounded border border-gray-200 bg-white p-1 text-sm dark:border-gray-700 dark:bg-gray-900"
-												>
-													{#each FONTS as font}
-														<option value={font.value}>{font.name}</option>
-													{/each}
-												</select>
-												<input
-													type="color"
-													bind:value={text.color}
-													oninput={render}
-													class="h-8 w-8 cursor-pointer rounded border-none p-0"
-												/>
-											</div>
-
-											<div class="space-y-1">
-												<div class="flex justify-between text-xs text-gray-500">
-													<span>Size</span>
-													<span>{text.fontSize}px</span>
-												</div>
-												<input
-													type="range"
-													min="12"
-													max="200"
-													bind:value={text.fontSize}
-													oninput={render}
-													class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-												/>
-											</div>
-
-											<div class="space-y-1">
-												<div class="flex justify-between text-xs text-gray-500">
-													<span>Rotation</span>
-													<span>{text.rotation}°</span>
-												</div>
-												<input
-													type="range"
-													min="-180"
-													max="180"
-													bind:value={text.rotation}
-													oninput={render}
-													class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-												/>
-											</div>
-
-											<div class="flex justify-end">
-												<Button
-													variant="destructive"
-													size="sm"
-													onclick={() => {
-														textElements = textElements.filter((t) => t.id !== selectedTextId);
-														selectedTextId = null;
-														render();
-													}}
-												>
-													Delete
-												</Button>
-											</div>
-										</div>
-									{/if}
-								{/each}
-							{/if}
 						</div>
 
 						<hr class="border-gray-200 dark:border-gray-700" />
@@ -1562,18 +1470,6 @@
 						<hr class="border-gray-200 dark:border-gray-700" />
 
 						<!-- Extras -->
-						<div class="space-y-4">
-							<div class="flex cursor-pointer items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Add Text</span>
-								<span class="text-gray-400">›</span>
-							</div>
-							<div class="flex cursor-pointer items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Watermark</span>
-								<span class="text-gray-400">›</span>
-							</div>
-						</div>
-
-						<hr class="border-gray-200 dark:border-gray-700" />
 
 						<!-- Noise -->
 						<div class="flex items-center justify-between">
