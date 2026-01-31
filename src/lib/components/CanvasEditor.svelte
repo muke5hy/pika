@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, tick } from 'svelte';
 	import toast, { Toaster } from 'svelte-french-toast';
 	import { Button } from '$lib/components/ui/button/index.js';
 
@@ -143,7 +143,7 @@
 	};
 
 	let options: Options = {
-		aspectRatio: 'aspect-video',
+		aspectRatio: '1600x900',
 		theme: GRADIENTS[0].class,
 		gradient: GRADIENTS[0].stops,
 		customTheme: false,
@@ -757,20 +757,29 @@
 		}
 	}
 
-	function loadImage(file: File) {
+	async function loadImage(file: File) {
 		const reader = new FileReader();
-		reader.onload = function (e: any) {
+		reader.onload = async function (e: any) {
 			const img = new Image();
-			img.onload = function () {
+			img.onload = async function () {
 				uploadedImage = img;
 				imageLoaded = true;
 
-				// Wait for canvas to be ready
-				setTimeout(() => {
-					if (canvas && ctx) {
-						updateCanvasSize();
+				// Wait for Svelte to render the canvas element
+				await tick();
+
+				// Now canvas should be available in DOM
+				if (canvas) {
+					if (!ctx) {
+						ctx = canvas.getContext('2d', { willReadFrequently: true });
 					}
-				}, 50);
+					if (ctx) {
+						updateCanvasSize();
+						fitImage();
+						applyPosition(options.position || 'center');
+						render();
+					}
+				}
 
 				toast.success('Image loaded!');
 			};
