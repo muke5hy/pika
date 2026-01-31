@@ -15,48 +15,34 @@
 	const ColorPickerIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 11a8 8 0 1 0-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 	const GRADIENTS = [
-		{
-			class: 'bg-gradient-to-br from-pink-300 via-orange-200 to-red-300',
-			stops: ['#f9a8d4', '#fed7aa', '#fca5a5']
-		},
-		{
-			class: 'bg-gradient-to-br from-green-300 via-yellow-200 to-green-200',
-			stops: ['#86efac', '#fef08a', '#bbf7d0']
-		},
-		{
-			class: 'bg-gradient-to-br from-green-200 via-blue-100 to-blue-300',
-			stops: ['#bbf7d0', '#dbeafe', '#93c5fd']
-		},
-		{
-			class: 'bg-gradient-to-br from-indigo-300 via-blue-400 to-purple-500',
-			stops: ['#a5b4fc', '#60a5fa', '#a855f7']
-		},
-		{
-			class: 'bg-gradient-to-br from-red-300 via-orange-300 to-yellow-200',
-			stops: ['#fca5a5', '#fdba74', '#fef08a']
-		},
-		{
-			class: 'bg-gradient-to-br from-pink-300 via-pink-400 to-red-400',
-			stops: ['#f9a8d4', '#f472b6', '#f87171']
-		},
-		{
-			class: 'bg-gradient-to-br from-slate-400 via-gray-500 to-gray-700',
-			stops: ['#94a3b8', '#6b7280', '#374151']
-		},
-		{
-			class: 'bg-gradient-to-br from-orange-300 via-orange-400 to-red-400',
-			stops: ['#fdba74', '#fb923c', '#f87171']
-		},
-		{ class: 'bg-gradient-to-br from-teal-300 to-cyan-400', stops: ['#5eead4', '#22d3ee'] },
-		{ class: 'bg-gradient-to-br from-red-300 to-purple-600', stops: ['#fca5a5', '#9333ea'] }
+		{ class: 'bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500', stops: ['#8b5cf6', '#a855f7', '#d946ef'] },
+		{ class: 'bg-gradient-to-br from-blue-500 via-cyan-400 to-teal-400', stops: ['#3b82f6', '#22d3ee', '#2dd4bf'] },
+		{ class: 'bg-gradient-to-br from-rose-400 via-pink-500 to-purple-500', stops: ['#fb7185', '#ec4899', '#a855f7'] },
+		{ class: 'bg-gradient-to-br from-orange-400 via-amber-400 to-yellow-300', stops: ['#fb923c', '#fbbf24', '#fde047'] },
+		{ class: 'bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-400', stops: ['#34d399', '#2dd4bf', '#22d3ee'] },
+		{ class: 'bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600', stops: ['#1e293b', '#334155', '#475569'] },
+		{ class: 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500', stops: ['#4f46e5', '#9333ea', '#ec4899'] },
+		{ class: 'bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600', stops: ['#38bdf8', '#3b82f6', '#4f46e5'] },
+		{ class: 'bg-gradient-to-br from-lime-400 via-green-400 to-emerald-500', stops: ['#a3e635', '#4ade80', '#10b981'] },
+		{ class: 'bg-gradient-to-br from-red-500 via-orange-500 to-amber-500', stops: ['#ef4444', '#f97316', '#f59e0b'] },
+		{ class: 'bg-gradient-to-br from-fuchsia-500 via-pink-500 to-rose-400', stops: ['#d946ef', '#ec4899', '#fb7185'] },
+		{ class: 'bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600', stops: ['#22d3ee', '#0ea5e9', '#2563eb'] },
+		{ class: 'bg-gradient-to-br from-zinc-900 via-neutral-800 to-stone-700', stops: ['#18181b', '#262626', '#44403c'] },
+		{ class: 'bg-gradient-to-br from-amber-200 via-orange-300 to-rose-300', stops: ['#fde68a', '#fdba74', '#fda4af'] },
+		{ class: 'bg-gradient-to-br from-teal-200 via-cyan-200 to-sky-300', stops: ['#99f6e4', '#a5f3fc', '#7dd3fc'] }
 	];
 
 	const FONTS = [
 		{ name: 'Inter', value: 'Inter, sans-serif' },
-		{ name: 'Serif', value: 'serif' },
-		{ name: 'Mono', value: 'monospace' },
-		{ name: 'Cursive', value: 'cursive' },
-		{ name: 'Fantasy', value: 'fantasy' }
+		{ name: 'System', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+		{ name: 'Georgia', value: 'Georgia, serif' },
+		{ name: 'Helvetica', value: 'Helvetica Neue, Helvetica, Arial, sans-serif' },
+		{ name: 'Times', value: 'Times New Roman, Times, serif' },
+		{ name: 'Courier', value: 'Courier New, Courier, monospace' },
+		{ name: 'Monaco', value: 'Monaco, Consolas, monospace' },
+		{ name: 'Verdana', value: 'Verdana, Geneva, sans-serif' },
+		{ name: 'Trebuchet', value: 'Trebuchet MS, sans-serif' },
+		{ name: 'Impact', value: 'Impact, Haettenschweiler, sans-serif' }
 	];
 
 	// Canvas references
@@ -120,6 +106,15 @@
 	let isDraggingText = false;
 	let dragTextStart = { x: 0, y: 0 };
 
+	// Alignment guides
+	type AlignmentGuide = {
+		type: 'horizontal' | 'vertical';
+		position: number;
+		label?: string;
+	};
+	let alignmentGuides: AlignmentGuide[] = [];
+	const SNAP_THRESHOLD = 8;
+
 	let bgPicker = false;
 
 	type Options = {
@@ -148,14 +143,11 @@
 	};
 
 	let options: Options = {
-		aspectRatio: 'aspect-auto',
-		theme: GRADIENTS[3].class,
-		gradient: GRADIENTS[3].stops,
-		customTheme: {
-			colorStart: '#ff40ff',
-			colorEnd: '#fec700'
-		},
-		customSize: { width: 1200, height: 800 },
+		aspectRatio: 'aspect-video',
+		theme: GRADIENTS[0].class,
+		gradient: GRADIENTS[0].stops,
+		customTheme: false,
+		customSize: { width: 1600, height: 900 },
 		position: 'center',
 		padding: 'p-20',
 		rounded: 'rounded-xl',
@@ -163,16 +155,15 @@
 		shadow: 'shadow-xl',
 		noise: false,
 		browserBar: 'hidden',
-		// New defaults
-		scale: 0.85,
-		roundness: 20,
+		scale: 0.9,
+		roundness: 16,
 		rotate: 0,
 		tilt: { active: false, angleX: 0, angleY: 0 },
-		inset: { active: true, color: '#000000', padding: 40 },
-		shadowBlur: 20,
-		shadowOpacity: 0.3,
-		shadowY: 10,
-		frame: 'Shortboard'
+		inset: { active: true, color: '#000000', padding: 12 },
+		shadowBlur: 40,
+		shadowOpacity: 0.4,
+		shadowY: 20,
+		frame: 'None'
 	};
 
 	const isValidHexColor = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
@@ -310,6 +301,18 @@
 			case 'aspect-[2/3]':
 				contentWidth = Math.round((baseHeight * 2) / 3);
 				contentHeight = baseHeight;
+				break;
+			case '1600x900':
+				canvasWidth = 1600;
+				canvasHeight = 900;
+				contentWidth = canvasWidth - padding * 2;
+				contentHeight = canvasHeight - padding * 2;
+				break;
+			case '1200x1200':
+				canvasWidth = 1200;
+				canvasHeight = 1200;
+				contentWidth = canvasWidth - padding * 2;
+				contentHeight = canvasHeight - padding * 2;
 				break;
 			case 'custom':
 				if (options.customSize) {
@@ -604,6 +607,9 @@
 
 			context.restore();
 		});
+
+		// Draw alignment guides last (on top of everything)
+		drawAlignmentGuides();
 	}
 
 	function roundRect(
@@ -638,8 +644,82 @@
 				buffer32[i] = 0xff000000 | (Math.random() * 0xffffff);
 			}
 		}
-		// This noise is too harsh, let's use a subtle overlay instead
-		// Actually, let's just draw a noise pattern image or simple random dots with low opacity
+	}
+
+	function calculateAlignmentGuides(elementX: number, elementY: number, elementW: number, elementH: number): { guides: AlignmentGuide[], snappedX: number, snappedY: number } {
+		const guides: AlignmentGuide[] = [];
+		let snappedX = elementX;
+		let snappedY = elementY;
+		const padding = getPaddingValue();
+
+		const centerX = canvasWidth / 2;
+		const centerY = canvasHeight / 2;
+
+		const elementCenterX = elementX + elementW / 2;
+		const elementCenterY = elementY + elementH / 2;
+		const elementRight = elementX + elementW;
+		const elementBottom = elementY + elementH;
+
+		// Vertical center line
+		if (Math.abs(elementCenterX - centerX) < SNAP_THRESHOLD) {
+			guides.push({ type: 'vertical', position: centerX, label: 'center' });
+			snappedX = centerX - elementW / 2;
+		}
+
+		// Horizontal center line
+		if (Math.abs(elementCenterY - centerY) < SNAP_THRESHOLD) {
+			guides.push({ type: 'horizontal', position: centerY, label: 'center' });
+			snappedY = centerY - elementH / 2;
+		}
+
+		// Left edge to padding
+		if (Math.abs(elementX - padding) < SNAP_THRESHOLD) {
+			guides.push({ type: 'vertical', position: padding });
+			snappedX = padding;
+		}
+
+		// Right edge to padding
+		if (Math.abs(elementRight - (canvasWidth - padding)) < SNAP_THRESHOLD) {
+			guides.push({ type: 'vertical', position: canvasWidth - padding });
+			snappedX = canvasWidth - padding - elementW;
+		}
+
+		// Top edge to padding
+		if (Math.abs(elementY - padding) < SNAP_THRESHOLD) {
+			guides.push({ type: 'horizontal', position: padding });
+			snappedY = padding;
+		}
+
+		// Bottom edge to padding
+		if (Math.abs(elementBottom - (canvasHeight - padding)) < SNAP_THRESHOLD) {
+			guides.push({ type: 'horizontal', position: canvasHeight - padding });
+			snappedY = canvasHeight - padding - elementH;
+		}
+
+		return { guides, snappedX, snappedY };
+	}
+
+	function drawAlignmentGuides() {
+		if (!ctx || alignmentGuides.length === 0) return;
+
+		ctx.save();
+		ctx.strokeStyle = '#3b82f6';
+		ctx.lineWidth = 1;
+		ctx.setLineDash([5, 5]);
+
+		alignmentGuides.forEach(guide => {
+			ctx!.beginPath();
+			if (guide.type === 'vertical') {
+				ctx!.moveTo(guide.position, 0);
+				ctx!.lineTo(guide.position, canvasHeight);
+			} else {
+				ctx!.moveTo(0, guide.position);
+				ctx!.lineTo(canvasWidth, guide.position);
+			}
+			ctx!.stroke();
+		});
+
+		ctx.restore();
 	}
 
 	function handleShortcuts(e: KeyboardEvent) {
@@ -805,26 +885,57 @@
 		const mouseY = (e.clientY - rect.top) * scaleY;
 
 		if (isDraggingOverlay && selectedOverlayId) {
-			const dx = mouseX - dragOverlayStart.x;
-			const dy = mouseY - dragOverlayStart.y;
+			const overlay = overlayImages.find(o => o.id === selectedOverlayId);
+			if (overlay) {
+				const dx = mouseX - dragOverlayStart.x;
+				const dy = mouseY - dragOverlayStart.y;
+				const newX = overlay.x + dx;
+				const newY = overlay.y + dy;
+				const w = overlay.image.width * overlay.scale;
+				const h = overlay.image.height * overlay.scale;
 
-			overlayImages = overlayImages.map((overlay) =>
-				overlay.id === selectedOverlayId
-					? { ...overlay, x: overlay.x + dx, y: overlay.y + dy }
-					: overlay
-			);
+				const { guides, snappedX, snappedY } = calculateAlignmentGuides(
+					newX - w / 2, newY - h / 2, w, h
+				);
+				alignmentGuides = guides;
+
+				overlayImages = overlayImages.map((o) =>
+					o.id === selectedOverlayId
+						? { ...o, x: snappedX + w / 2, y: snappedY + h / 2 }
+						: o
+				);
+			}
 			dragOverlayStart = { x: mouseX, y: mouseY };
 			render();
 			return;
 		}
 
 		if (isDraggingText && selectedTextId) {
-			const dx = mouseX - dragTextStart.x;
-			const dy = mouseY - dragTextStart.y;
+			const text = textElements.find(t => t.id === selectedTextId);
+			if (text && ctx) {
+				const dx = mouseX - dragTextStart.x;
+				const dy = mouseY - dragTextStart.y;
+				const newX = text.x + dx;
+				const newY = text.y + dy;
 
-			textElements = textElements.map((text) =>
-				text.id === selectedTextId ? { ...text, x: text.x + dx, y: text.y + dy } : text
-			);
+				ctx.save();
+				ctx.font = `${text.fontSize}px ${text.fontFamily}`;
+				const metrics = ctx.measureText(text.text);
+				const w = metrics.width;
+				const h = text.fontSize;
+				ctx.restore();
+
+				const { guides, snappedX, snappedY } = calculateAlignmentGuides(
+					newX - w / 2, newY - h / 2, w, h
+				);
+				alignmentGuides = guides;
+
+				textElements = textElements.map((t) =>
+					t.id === selectedTextId
+						? { ...t, x: snappedX + w / 2, y: snappedY + h / 2 }
+						: t
+				);
+			}
 			dragTextStart = { x: mouseX, y: mouseY };
 			render();
 			return;
@@ -832,8 +943,16 @@
 
 		if (!isDragging) return;
 
-		imageX = mouseX - dragStartX;
-		imageY = mouseY - dragStartY;
+		const newX = mouseX - dragStartX;
+		const newY = mouseY - dragStartY;
+
+		const { guides, snappedX, snappedY } = calculateAlignmentGuides(
+			newX, newY, imageWidth, imageHeight
+		);
+		alignmentGuides = guides;
+
+		imageX = snappedX;
+		imageY = snappedY;
 		options = { ...options, position: 'custom' };
 
 		render();
@@ -843,6 +962,8 @@
 		isDragging = false;
 		isDraggingText = false;
 		isDraggingOverlay = false;
+		alignmentGuides = [];
+		render();
 	}
 
 	function handleDoubleClick(e: MouseEvent) {
@@ -876,14 +997,14 @@
 				selectedTextId = text.id;
 				render();
 
-				// Focus the textarea after render
+				// Focus the input after render
 				setTimeout(() => {
-					const textarea = document.getElementById(`text-edit-${text.id}`);
-					if (textarea) {
-						(textarea as HTMLTextAreaElement).focus();
-						(textarea as HTMLTextAreaElement).select();
+					const input = document.getElementById(`text-edit-${text.id}`) as HTMLInputElement;
+					if (input) {
+						input.focus();
+						input.select();
 					}
-				}, 0);
+				}, 50);
 				return;
 			}
 		}
@@ -927,14 +1048,15 @@
 
 	function addText() {
 		const id = Math.random().toString(36).substr(2, 9);
+		const padding = getPaddingValue();
 		const newText: TextElement = {
 			id,
-			text: 'New Text',
+			text: 'Your text here',
 			x: canvasWidth / 2,
-			y: canvasHeight / 2,
-			fontSize: 40,
-			fontFamily: 'Inter, sans-serif',
-			color: '#000000',
+			y: padding / 2 + 20,
+			fontSize: 48,
+			fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+			color: '#ffffff',
 			align: 'center',
 			rotation: 0
 		};
@@ -1078,6 +1200,29 @@
 		toast.success('Canvas cleared!');
 	}
 
+	function resetAll() {
+		uploadedImage = null;
+		imageLoaded = false;
+		editMode = true;
+		imageX = 0;
+		imageY = 0;
+		imageScale = 1;
+		imageWidth = 0;
+		imageHeight = 0;
+		textElements = [];
+		selectedTextId = null;
+		editingTextId = null;
+		overlayImages = [];
+		selectedOverlayId = null;
+		alignmentGuides = [];
+
+		if (ctx && canvas) {
+			ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+		}
+
+		toast.success('Canvas cleared! Settings preserved.');
+	}
+
 	// Reactive: Re-render when aspect ratio changes
 	$: if (options.aspectRatio && canvas) {
 		updateCanvasSize();
@@ -1127,380 +1272,349 @@
 			<div
 				class="fixed top-0 right-0 z-40 h-screen w-full overflow-y-auto border-l border-gray-200 bg-white/90 backdrop-blur-xl transition-all duration-300 lg:relative lg:z-0 lg:h-auto lg:w-[350px] dark:border-gray-800 dark:bg-gray-900/90"
 			>
-				<div class="p-4 lg:p-6">
-					<div class="mb-4 flex items-center justify-between lg:hidden">
-						<h2 class="font-semibold">Settings</h2>
-						<Button variant="ghost" size="icon" onclick={() => (isSidebarOpen = false)}>
-							<span class="sr-only">Close</span>
-							<svg
-								width="15"
-								height="15"
-								viewBox="0 0 15 15"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-								><path
-									d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.50005L3.21846 10.9685C2.99391 11.193 2.99391 11.5571 3.21846 11.7816C3.44301 12.0062 3.80708 12.0062 4.03164 11.7816L7.50005 8.31322L10.9685 11.7816C11.193 12.0062 11.5571 12.0062 11.7816 11.7816C12.0062 11.5571 12.0062 11.193 11.7816 10.9685L8.31322 7.50005L11.7816 4.03157Z"
-									fill="currentColor"
-									fill-rule="evenodd"
-									clip-rule="evenodd"
-								></path></svg
+				<div class="flex h-full flex-col">
+					<!-- Header -->
+					<div class="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+						<h2 class="text-base font-semibold text-gray-900 dark:text-white">Editor</h2>
+						<div class="flex items-center gap-2">
+							<button
+								class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
+								onclick={resetAll}
+								title="Reset everything"
 							>
-						</Button>
+								<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+									<path d="M3 3v5h5" />
+								</svg>
+							</button>
+							<button class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 lg:hidden dark:hover:bg-gray-800" onclick={() => (isSidebarOpen = false)}>
+								<svg width="16" height="16" viewBox="0 0 15 15" fill="none"><path d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.50005L3.21846 10.9685C2.99391 11.193 2.99391 11.5571 3.21846 11.7816C3.44301 12.0062 3.80708 12.0062 4.03164 11.7816L7.50005 8.31322L10.9685 11.7816C11.193 12.0062 11.5571 12.0062 11.7816 11.7816C12.0062 11.5571 12.0062 11.193 11.7816 10.9685L8.31322 7.50005L11.7816 4.03157Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+							</button>
+						</div>
 					</div>
-					<div class="flex flex-col space-y-6">
-						<!-- Frame -->
-						<div class="flex items-center justify-between">
-							<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Frame</span>
-							<select
-								bind:value={options.frame}
-								class="cursor-pointer rounded border-none bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800"
-							>
-								<option value="Shortboard">Shortboard</option>
-								<option value="None">None</option>
-								<option value="Browser">Browser</option>
-							</select>
-						</div>
 
-						<!-- Size -->
-						<div class="space-y-2">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Size</span>
-								<span class="text-xs text-gray-500">{Math.round((options.scale || 1) * 100)}</span>
-							</div>
-							<input
-								type="range"
-								min="0.5"
-								max="1.5"
-								step="0.01"
-								bind:value={options.scale}
-								oninput={render}
-								class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-							/>
-						</div>
-
-						<!-- Roundness -->
-						<div class="space-y-2">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Roundness</span>
-								<span class="text-xs text-gray-500">{options.roundness}</span>
-							</div>
-							<input
-								type="range"
-								min="0"
-								max="50"
-								step="1"
-								bind:value={options.roundness}
-								oninput={render}
-								class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-							/>
-						</div>
-
-						<!-- Shadow -->
-						<div class="space-y-2">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Shadow</span>
-								<span class="text-xs text-gray-500">{options.shadowOpacity}</span>
-							</div>
-							<div class="flex items-center space-x-2">
-								<input
-									type="range"
-									min="0"
-									max="1"
-									step="0.05"
-									bind:value={options.shadowOpacity}
-									oninput={render}
-									class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-								/>
-							</div>
-						</div>
-
-						<!-- Inset -->
-						<div class="space-y-2">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Inset</span>
-								<div class="flex items-center space-x-2">
-									<input
-										type="checkbox"
-										bind:checked={options.inset!.active}
-										onchange={render}
-										class="rounded text-pink-600 focus:ring-pink-500"
-									/>
-									<input
-										type="color"
-										bind:value={options.inset!.color}
-										oninput={render}
-										class="h-6 w-6 cursor-pointer rounded border-none p-0"
-									/>
-								</div>
-							</div>
-							{#if options.inset?.active}
-								<input
-									type="range"
-									min="0"
-									max="100"
-									step="1"
-									bind:value={options.inset!.padding}
-									oninput={render}
-									class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-								/>
-							{/if}
-						</div>
-
-						<!-- Position & Transform -->
-						<div class="space-y-3">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300"
-									>Position & Rotate</span
-								>
-							</div>
-							<div class="flex items-center gap-3">
-								<!-- Position Grid -->
-								<div class="grid w-20 grid-cols-3 gap-0.5">
-									{#each ['top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'] as pos}
-										<button
-											class={cls(
-												'flex h-5 w-5 items-center justify-center rounded border',
-												options.position === pos
-													? 'border-black bg-black'
-													: 'border-gray-200 bg-white hover:bg-gray-100'
-											)}
-											onclick={() => {
-												applyPosition(pos);
-												render();
+					<!-- Scrollable Content -->
+					<div class="flex-1 overflow-y-auto">
+						<div class="space-y-1 p-3">
+							<!-- Quick Actions - Add Elements -->
+							<div class="rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 p-4 dark:from-indigo-950/30 dark:to-purple-950/30">
+								<p class="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Add Elements</p>
+								<div class="grid grid-cols-2 gap-2">
+									<button
+										class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-gray-300 hover:shadow dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+										onclick={addText}
+									>
+										<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<polyline points="4 7 4 4 20 4 20 7"></polyline>
+											<line x1="9" y1="20" x2="15" y2="20"></line>
+											<line x1="12" y1="4" x2="12" y2="20"></line>
+										</svg>
+										Text
+									</button>
+									<label class="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-gray-300 hover:shadow dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200">
+										<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+											<circle cx="8.5" cy="8.5" r="1.5"></circle>
+											<polyline points="21 15 16 10 5 21"></polyline>
+										</svg>
+										Image
+										<input
+											type="file"
+											accept="image/*"
+											class="hidden"
+											onchange={(e) => {
+												const file = (e.target as HTMLInputElement).files?.[0];
+												if (file) {
+													addOverlayImage(file);
+													(e.target as HTMLInputElement).value = '';
+												}
 											}}
-											title={pos}
-										>
-											<div
-												class={cls(
-													'h-1 w-1 rounded-full',
-													options.position === pos ? 'bg-white' : 'bg-gray-400'
-												)}
-											></div>
-										</button>
-									{/each}
-								</div>
-								<!-- Rotate Control -->
-								<div class="flex-1 space-y-1">
-									<div class="flex justify-between text-xs text-gray-500">
-										<span>Rotate</span>
-										<span>{options.rotate}°</span>
-									</div>
-									<input
-										type="range"
-										min="-45"
-										max="45"
-										step="1"
-										bind:value={options.rotate}
-										oninput={render}
-										class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-									/>
+										/>
+									</label>
 								</div>
 							</div>
-						</div>
 
-						<hr class="border-gray-200 dark:border-gray-700" />
-
-						<!-- Overlay Images -->
-						<div class="space-y-4">
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300"
-									>Overlay Images</span
-								>
-								<label>
-									<Button
-										variant="outline"
-										size="sm"
-										onclick={() => document.getElementById('overlay-image-input')?.click()}
-									>
-										Add Image
-									</Button>
-									<input
-										id="overlay-image-input"
-										type="file"
-										accept="image/*"
-										class="hidden"
-										onchange={(e) => {
-											const file = (e.target as HTMLInputElement).files?.[0];
-											if (file) {
-												addOverlayImage(file);
-												// Reset input so same file can be selected again
-												(e.target as HTMLInputElement).value = '';
-											}
-										}}
-									/>
-								</label>
-							</div>
-
-							{#if selectedOverlayId}
-								{#each overlayImages as overlay}
-									{#if overlay.id === selectedOverlayId}
-										<div class="space-y-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-											<div class="space-y-1">
-												<div class="flex justify-between text-xs text-gray-500">
-													<span>Scale</span>
-													<span>{(overlay.scale * 100).toFixed(0)}%</span>
-												</div>
-												<input
-													type="range"
-													min="0.1"
-													max="2"
-													step="0.05"
-													bind:value={overlay.scale}
-													oninput={render}
-													class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-												/>
-											</div>
-
-											<div class="space-y-1">
-												<div class="flex justify-between text-xs text-gray-500">
-													<span>Rotation</span>
-													<span>{overlay.rotation}°</span>
-												</div>
-												<input
-													type="range"
-													min="-180"
-													max="180"
-													bind:value={overlay.rotation}
-													oninput={render}
-													class="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
-												/>
-											</div>
-
-											<div class="flex justify-end">
-												<Button
-													variant="destructive"
-													size="sm"
-													onclick={() => {
-														overlayImages = overlayImages.filter((o) => o.id !== selectedOverlayId);
-														selectedOverlayId = null;
-														render();
-													}}
+							<!-- Selected Text Controls -->
+							{#if selectedTextId}
+								{@const selectedText = textElements.find(t => t.id === selectedTextId)}
+								{#if selectedText}
+									<div class="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30">
+										<div class="mb-3 flex items-center justify-between">
+											<p class="text-xs font-medium uppercase tracking-wide text-blue-600 dark:text-blue-400">Text Properties</p>
+											<button
+												class="text-xs text-red-500 hover:text-red-600"
+												onclick={() => {
+													textElements = textElements.filter(t => t.id !== selectedTextId);
+													selectedTextId = null;
+													render();
+												}}
+											>Delete</button>
+										</div>
+										<div class="space-y-3">
+											<div class="flex gap-2">
+												<select
+													bind:value={selectedText.fontFamily}
+													onchange={render}
+													class="flex-1 rounded-lg border-none bg-white px-2 py-1.5 text-sm dark:bg-gray-800"
 												>
-													Delete
-												</Button>
+													{#each FONTS as font}
+														<option value={font.value}>{font.name}</option>
+													{/each}
+												</select>
+												<input
+													type="number"
+													bind:value={selectedText.fontSize}
+													oninput={render}
+													class="w-16 rounded-lg border-none bg-white px-2 py-1.5 text-sm dark:bg-gray-800"
+													min="10"
+													max="200"
+												/>
+												<input
+													type="color"
+													bind:value={selectedText.color}
+													oninput={render}
+													class="h-8 w-8 cursor-pointer rounded-lg border-none p-0"
+												/>
 											</div>
-										</div>
-									{/if}
-								{/each}
-							{/if}
-						</div>
-
-						<hr class="border-gray-200 dark:border-gray-700" />
-
-						<!-- Canvas Options -->
-						<div class="space-y-4">
-							<div class="space-y-2">
-								<div class="flex items-center justify-between">
-									<span class="text-sm font-medium text-gray-700 dark:text-gray-300"
-										>Canvas Size</span
-									>
-									<select
-										bind:value={options.aspectRatio}
-										onchange={updateCanvasSize}
-										class="cursor-pointer rounded border-none bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800"
-									>
-										<option value="aspect-auto">Auto</option>
-										<option value="aspect-square">Square (1:1)</option>
-										<option value="aspect-video">Video (16:9)</option>
-										<option value="aspect-[4/3]">4:3</option>
-										<option value="aspect-[3/2]">3:2</option>
-										<option value="aspect-[9/16]">9:16</option>
-										<option value="custom">Custom</option>
-									</select>
-								</div>
-								{#if options.aspectRatio === 'custom' && options.customSize}
-									<div class="flex space-x-2">
-										<div class="flex-1 space-y-1">
-											<label class="text-xs text-gray-500">Width</label>
-											<input
-												type="number"
-												bind:value={options.customSize.width}
-												oninput={updateCanvasSize}
-												class="w-full rounded border-none bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800"
-											/>
-										</div>
-										<div class="flex-1 space-y-1">
-											<label class="text-xs text-gray-500">Height</label>
-											<input
-												type="number"
-												bind:value={options.customSize.height}
-												oninput={updateCanvasSize}
-												class="w-full rounded border-none bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800"
-											/>
+											<div class="flex gap-1">
+												{#each ['left', 'center', 'right'] as align}
+													<button
+														class={cls(
+															'flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors',
+															selectedText.align === align
+																? 'bg-blue-500 text-white'
+																: 'bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300'
+														)}
+														onclick={() => {
+															selectedText.align = align as 'left' | 'center' | 'right';
+															render();
+														}}
+													>
+														{align.charAt(0).toUpperCase() + align.slice(1)}
+													</button>
+												{/each}
+											</div>
 										</div>
 									</div>
 								{/if}
-							</div>
+							{/if}
 
-							<div class="flex items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Background</span>
-								<div class="flex items-center space-x-2">
-									<span class="text-xs text-gray-500">Gradient</span>
-									<div
-										class="h-6 w-6 rounded-full border border-gray-200 bg-gradient-to-br from-blue-400 to-purple-500"
-									></div>
+							<!-- Selected Overlay Controls -->
+							{#if selectedOverlayId}
+								{@const selectedOverlay = overlayImages.find(o => o.id === selectedOverlayId)}
+								{#if selectedOverlay}
+									<div class="rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/30">
+										<div class="mb-3 flex items-center justify-between">
+											<p class="text-xs font-medium uppercase tracking-wide text-green-600 dark:text-green-400">Overlay Image</p>
+											<button
+												class="text-xs text-red-500 hover:text-red-600"
+												onclick={() => {
+													overlayImages = overlayImages.filter(o => o.id !== selectedOverlayId);
+													selectedOverlayId = null;
+													render();
+												}}
+											>Delete</button>
+										</div>
+										<div class="space-y-3">
+											<div class="space-y-1">
+												<div class="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+													<span>Scale</span>
+													<span>{(selectedOverlay.scale * 100).toFixed(0)}%</span>
+												</div>
+												<input type="range" min="0.1" max="2" step="0.05" bind:value={selectedOverlay.scale} oninput={render} class="slider-input" />
+											</div>
+											<div class="space-y-1">
+												<div class="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+													<span>Rotation</span>
+													<span>{selectedOverlay.rotation}°</span>
+												</div>
+												<input type="range" min="-180" max="180" bind:value={selectedOverlay.rotation} oninput={render} class="slider-input" />
+											</div>
+										</div>
+									</div>
+								{/if}
+							{/if}
+
+							<!-- Image Controls -->
+							<details class="group rounded-xl bg-white shadow-sm dark:bg-gray-800/50" open>
+								<summary class="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+									<span class="flex items-center gap-2">
+										<svg class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+										Image
+									</span>
+									<svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+								</summary>
+								<div class="space-y-4 border-t border-gray-100 px-4 py-4 dark:border-gray-700">
+									<div class="space-y-2">
+										<div class="flex items-center justify-between text-xs text-gray-500">
+											<span>Size</span>
+											<span>{Math.round((options.scale || 1) * 100)}%</span>
+										</div>
+										<input type="range" min="0.5" max="1.5" step="0.01" bind:value={options.scale} oninput={render} class="slider-input" />
+									</div>
+									<div class="space-y-2">
+										<div class="flex items-center justify-between text-xs text-gray-500">
+											<span>Roundness</span>
+											<span>{options.roundness}px</span>
+										</div>
+										<input type="range" min="0" max="50" step="1" bind:value={options.roundness} oninput={render} class="slider-input" />
+									</div>
+									<div class="space-y-2">
+										<div class="flex items-center justify-between text-xs text-gray-500">
+											<span>Shadow</span>
+											<span>{Math.round((options.shadowOpacity || 0) * 100)}%</span>
+										</div>
+										<input type="range" min="0" max="1" step="0.05" bind:value={options.shadowOpacity} oninput={render} class="slider-input" />
+									</div>
+									<div class="space-y-2">
+										<div class="flex items-center justify-between">
+											<span class="text-xs text-gray-500">Inset Border</span>
+											<div class="flex items-center gap-2">
+												<input type="color" bind:value={options.inset!.color} oninput={render} class="h-6 w-6 cursor-pointer rounded border-none p-0" />
+												<input type="checkbox" bind:checked={options.inset!.active} onchange={render} class="rounded text-indigo-600" />
+											</div>
+										</div>
+										{#if options.inset?.active}
+											<input type="range" min="0" max="100" step="1" bind:value={options.inset!.padding} oninput={render} class="slider-input" />
+										{/if}
+									</div>
 								</div>
-							</div>
+							</details>
 
-							<!-- Background Picker -->
-							<div class="grid grid-cols-6 gap-2">
-								{#each GRADIENTS as gradient (gradient.class)}
-									<button
-										class={'h-6 w-6 cursor-pointer rounded-full shadow-sm ' + gradient.class}
-										onclick={() => {
-											options = {
-												...options,
-												theme: gradient.class,
-												gradient: gradient.stops,
-												customTheme: false
-											};
-											render();
-										}}
-										aria-label="Select theme"
-									></button>
-								{/each}
-							</div>
+							<!-- Position & Transform -->
+							<details class="group rounded-xl bg-white shadow-sm dark:bg-gray-800/50" open>
+								<summary class="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+									<span class="flex items-center gap-2">
+										<svg class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
+										Position
+									</span>
+									<svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+								</summary>
+								<div class="space-y-4 border-t border-gray-100 px-4 py-4 dark:border-gray-700">
+									<div class="flex items-center gap-4">
+										<div class="grid w-[72px] grid-cols-3 gap-1">
+											{#each ['top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'] as pos}
+												<button
+													class={cls(
+														'flex h-5 w-5 items-center justify-center rounded transition-all',
+														options.position === pos
+															? 'bg-indigo-500 shadow-sm'
+															: 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600'
+													)}
+													onclick={() => { applyPosition(pos); render(); }}
+													title={pos}
+												>
+													<div class={cls('h-1.5 w-1.5 rounded-full', options.position === pos ? 'bg-white' : 'bg-gray-400')}></div>
+												</button>
+											{/each}
+										</div>
+										<div class="flex-1 space-y-1">
+											<div class="flex justify-between text-xs text-gray-500">
+												<span>Rotate</span>
+												<span>{options.rotate}°</span>
+											</div>
+											<input type="range" min="-45" max="45" step="1" bind:value={options.rotate} oninput={render} class="slider-input" />
+										</div>
+									</div>
+								</div>
+							</details>
 
-							<div class="flex cursor-pointer items-center justify-between">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pattern</span>
-								<span class="text-xs text-gray-500">None</span>
-							</div>
+							<!-- Canvas Settings -->
+							<details class="group rounded-xl bg-white shadow-sm dark:bg-gray-800/50">
+								<summary class="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+									<span class="flex items-center gap-2">
+										<svg class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+										Canvas
+									</span>
+									<svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+								</summary>
+								<div class="space-y-4 border-t border-gray-100 px-4 py-4 dark:border-gray-700">
+									<div class="flex items-center justify-between">
+										<span class="text-xs text-gray-500">Size</span>
+										<select bind:value={options.aspectRatio} onchange={updateCanvasSize} class="rounded-lg border-none bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700">
+											<option value="aspect-auto">Auto</option>
+											<option value="aspect-square">1:1</option>
+											<option value="aspect-video">16:9</option>
+											<option value="aspect-[4/3]">4:3</option>
+											<option value="aspect-[3/2]">3:2</option>
+											<option value="aspect-[9/16]">9:16</option>
+											<option value="1600x900">1600×900</option>
+											<option value="1200x1200">1200×1200</option>
+											<option value="custom">Custom</option>
+										</select>
+									</div>
+									{#if options.aspectRatio === 'custom' && options.customSize}
+										<div class="flex gap-2">
+											<div class="flex-1">
+												<label class="text-xs text-gray-400">W</label>
+												<input type="number" bind:value={options.customSize.width} oninput={updateCanvasSize} class="w-full rounded-lg border-none bg-gray-100 px-2 py-1 text-sm dark:bg-gray-700" />
+											</div>
+											<div class="flex-1">
+												<label class="text-xs text-gray-400">H</label>
+												<input type="number" bind:value={options.customSize.height} oninput={updateCanvasSize} class="w-full rounded-lg border-none bg-gray-100 px-2 py-1 text-sm dark:bg-gray-700" />
+											</div>
+										</div>
+									{/if}
+									<div class="flex items-center justify-between">
+										<span class="text-xs text-gray-500">Frame</span>
+										<select bind:value={options.frame} class="rounded-lg border-none bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700">
+											<option value="Shortboard">Shortboard</option>
+											<option value="None">None</option>
+											<option value="Browser">Browser</option>
+										</select>
+									</div>
+									<div class="flex items-center justify-between">
+										<span class="text-xs text-gray-500">Noise</span>
+										<input type="checkbox" bind:checked={options.noise} onchange={render} class="rounded text-indigo-600" />
+									</div>
+								</div>
+							</details>
+
+							<!-- Background -->
+							<details class="group rounded-xl bg-white shadow-sm dark:bg-gray-800/50" open>
+								<summary class="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+									<span class="flex items-center gap-2">
+										<svg class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg>
+										Background
+									</span>
+									<svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+								</summary>
+								<div class="border-t border-gray-100 px-4 py-4 dark:border-gray-700">
+									<div class="grid grid-cols-5 gap-2">
+										{#each GRADIENTS as gradient (gradient.class)}
+											<button
+												class={cls(
+													'h-8 w-full cursor-pointer rounded-lg shadow-sm ring-2 ring-offset-2 transition-all ' + gradient.class,
+													options.theme === gradient.class ? 'ring-indigo-500' : 'ring-transparent hover:ring-gray-300'
+												)}
+												onclick={() => {
+													options = { ...options, theme: gradient.class, gradient: gradient.stops, customTheme: false };
+													render();
+												}}
+											></button>
+										{/each}
+									</div>
+								</div>
+							</details>
 						</div>
+					</div>
 
-						<hr class="border-gray-200 dark:border-gray-700" />
-
-						<!-- Extras -->
-
-						<!-- Noise -->
-						<div class="flex items-center justify-between">
-							<div class="flex items-center space-x-2">
-								<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Noise</span>
-							</div>
-							<input
-								type="checkbox"
-								bind:checked={options.noise}
-								onchange={render}
-								class="rounded text-pink-600 focus:ring-pink-500"
-							/>
-						</div>
-
-						<!-- Actions -->
-						<div class="flex space-x-2 pt-4">
+					<!-- Footer Actions -->
+					<div class="border-t border-gray-100 p-4 dark:border-gray-800">
+						<div class="flex gap-2">
 							<button
-								class="flex flex-1 items-center justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 duration-200 hover:bg-gray-200"
+								class="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
 								onclick={copyImage}
-								title="Use Ctrl/Cmd + C to copy the image"
 							>
-								<span class="mr-2 h-4 w-4">{@html ClipboardIcon}</span>
+								<span class="h-4 w-4">{@html ClipboardIcon}</span>
 								Copy
 							</button>
 							<button
-								class="flex flex-1 items-center justify-center rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white duration-200 hover:bg-gray-800"
-								title="Use Ctrl/Cmd + S to save the image"
+								class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 py-3 text-sm font-medium text-white shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl hover:shadow-indigo-500/30"
 								onclick={saveImage}
 							>
-								<span class="mr-2 h-4 w-4">{@html SaveIcon}</span>
-								Save
+								<span class="h-4 w-4">{@html SaveIcon}</span>
+								Export
 							</button>
 						</div>
 					</div>
@@ -1512,7 +1626,7 @@
 			class="flex h-full w-full flex-col items-center justify-center overflow-hidden bg-gray-50 py-5 lg:w-full lg:p-10 lg:pl-0 dark:bg-black"
 		>
 			{#if imageLoaded}
-				<div class="my-5">
+				<div class="relative my-5">
 					<canvas
 						bind:this={canvas}
 						class:view-mode={!editMode}
@@ -1532,44 +1646,42 @@
 								{@const rect = canvas.getBoundingClientRect()}
 								{@const scaleX = rect.width / canvas.width}
 								{@const scaleY = rect.height / canvas.height}
-								<textarea
+								<input
+									type="text"
 									id="text-edit-{text.id}"
 									value={text.text}
 									oninput={(e) => {
 										text.text = e.currentTarget.value;
-										render(); // Re-render to update metrics if needed (though hidden)
+										textElements = textElements;
+										render();
 									}}
 									onblur={() => {
 										editingTextId = null;
 										render();
 									}}
 									onkeydown={(e) => {
-										if (e.key === 'Enter' && !e.shiftKey) {
+										if (e.key === 'Enter') {
 											e.preventDefault();
 											editingTextId = null;
 											render();
 										}
+										if (e.key === 'Escape') {
+											editingTextId = null;
+											render();
+										}
 									}}
+									class="absolute z-50 border-2 border-dashed border-blue-500 bg-black/20 px-2 backdrop-blur-sm"
 									style="
-                                        position: absolute;
-                                        left: {text.x * scaleX}px;
-                                        top: {text.y * scaleY}px;
-                                        transform: translate(-50%, -50%);
-                                        font-size: {text.fontSize * scaleX}px;
-                                        font-family: {text.fontFamily};
-                                        color: {text.color};
-                                        background: transparent;
-                                        border: 1px dashed #3b82f6;
-                                        outline: none;
-                                        text-align: {text.align};
-                                        resize: none;
-                                        overflow: hidden;
-                                        white-space: nowrap;
-                                        z-index: 50;
-                                        padding: 0;
-                                        margin: 0;
-                                    "
-								></textarea>
+										left: {text.x * scaleX}px;
+										top: {text.y * scaleY}px;
+										transform: translate(-50%, -50%);
+										font-size: {text.fontSize * scaleX}px;
+										font-family: {text.fontFamily};
+										color: {text.color};
+										text-align: {text.align};
+										min-width: 100px;
+									"
+								/>
 							{/if}
 						{/each}
 					{/if}
@@ -1594,37 +1706,6 @@
 					</label>
 				</div>
 			{/if}
-
-			<div
-				class="flex flex-col items-center justify-center pb-5 text-sm opacity-60 lg:absolute lg:bottom-[20px] lg:flex-row lg:pt-20 lg:pb-0 dark:text-gray-400"
-			>
-				<a
-					href="https://twitter.com/thelifeofrishi"
-					target="_blank"
-					class="flex items-center hover:underline"
-				>
-					<span class="mx-1 h-5 w-5">{@html TwitterIcon}</span>
-					Created by Rishi Mohan
-				</a>
-				<span class="hidden px-2 lg:block">-</span>
-				<a
-					href="https://github.com/rishimohan/pika"
-					target="_blank"
-					class="mt-2 flex items-center hover:underline lg:mt-0"
-				>
-					<span class="mx-1 h-5 w-5">{@html GithubIcon}</span>
-					View Code on Github
-				</a>
-				<span class="hidden px-2 lg:block">-</span>
-				<a
-					href="https://www.buymeacoffee.com/thelifeofrishi"
-					target="_blank"
-					class="mt-2 flex items-center hover:underline lg:mt-0"
-				>
-					<span class="mx-1 h-5 w-5">{@html CoffeeIcon}</span>
-					Buy me a coffee
-				</a>
-			</div>
 		</div>
 	</div>
 </div>
@@ -1640,5 +1721,47 @@
 	}
 	canvas.view-mode {
 		cursor: default;
+	}
+	.slider-input {
+		height: 6px;
+		width: 100%;
+		cursor: pointer;
+		appearance: none;
+		border-radius: 9999px;
+		background-color: #e5e7eb;
+	}
+	:global(.dark) .slider-input {
+		background-color: #374151;
+	}
+	.slider-input::-webkit-slider-thumb {
+		height: 16px;
+		width: 16px;
+		appearance: none;
+		border-radius: 9999px;
+		background-color: #6366f1;
+		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+		transition: transform 0.15s;
+	}
+	.slider-input::-webkit-slider-thumb:hover {
+		transform: scale(1.1);
+	}
+	.slider-input::-moz-range-thumb {
+		height: 16px;
+		width: 16px;
+		appearance: none;
+		border-radius: 9999px;
+		border: none;
+		background-color: #6366f1;
+		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+		transition: transform 0.15s;
+	}
+	.slider-input::-moz-range-thumb:hover {
+		transform: scale(1.1);
+	}
+	details summary::-webkit-details-marker {
+		display: none;
+	}
+	details summary {
+		list-style: none;
 	}
 </style>
